@@ -7,6 +7,13 @@ snippet incc
 	#include <${1:iostream}>
 snippet binc
 	#include <boost/${1:shared_ptr}.hpp>
+snippet ginc
+	#include <glm/${1:vec3}.hpp>
+snippet cinc
+	#include <cth/${1:engine}.h>
+snippet glew
+	#include <GL/glew.h>
+
 ##
 ## STL Collections
 # std::array
@@ -201,5 +208,19 @@ snippet try
 		
 	}
 
+#string map selector
+snippet map_sel
+	enum ${1:enum_name} {
+		${2:FIRST}
+	};
+	const std::map<std::string, $1> selector {
+		{ "$2", $2 }
+	};
 
-
+	auto it = selector.find(${3:str});
+	if(it != selector.end()) {
+		switch(it->second) {
+		case $2:
+			break;
+		}
+	}
