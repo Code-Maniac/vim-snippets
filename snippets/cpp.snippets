@@ -70,6 +70,9 @@ snippet queue
 # std::priority_queue
 snippet pqueue
 	std::priority_queue<${1:T}> ${2};
+# std::string
+snippet str
+	std::string
 
 # std::unique_ptr
 snippet uniq
@@ -176,6 +179,11 @@ snippet ns
 	namespace ${1:`vim_snippets#Filename('', 'my')`} {
 		${0}
 	} /* namespace $1 */
+# annonymous namespace
+snippet ans
+	namespace {
+		${0}
+	}
 ##
 ## Input/Output
 # std::cout
@@ -187,6 +195,15 @@ snippet cerr
 # std::cin
 snippet cin
 	std::cin >> ${1};
+# std::cout args passed to main
+snippet cout_args
+	for(int x = 0; x < argc; ++x) {
+		std::cout << argv[x] << std::endl;
+	}
+snippet cerr_args
+	for(int x = 0; x < argc; ++x) {
+		std::cerr << argv[x] << std::endl;
+	}
 ##
 ## Casts
 # static
@@ -264,27 +281,154 @@ snippet map_sel
 			break;
 		}
 	}
-
 #useful opengl
 snippet nvarray
-	glGenVertexArrays(${1:1}, ${2:vao});
+	glGenVertexArrays(${1:1}, &${2:vao});
 	glBindVertexArray($2);
-
 snippet nibo
-	glGenBuffers(${1:1}, ${2:ibo});
+	glGenBuffers(${1:1}, &${2:ibo});
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, $2);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * ${3:indices}.size(), &$3[0], GL_STATIC_DRAW);
-
 snippet nvbo
-	glGenBuffer(${1:1}, ${2:vbo});
+	glGenBuffers(${1:1}, &${2:vbo});
 	glBindBuffer(GL_ARRAY_BUFFER, $2);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * ${3:vertices}.size(), &$3[0], GL_STATIC_DRAW);
-
 snippet ntbo
-	glGenBuffer(${1:1}, ${2:uvbo});
+	glGenBuffers(${1:1}, &${2:uvbo});
 	glBindBuffer(GL_ARRAY_BUFFER, $2);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * ${3:uvs}.size(), &$3[0], GL_STATIC_DRAW);
-
 snippet enable_vaa
 	glEnableVertexAttribArray(${1:0});
 	glVertexAttribPointer($1, ${2:3}, GL_FLOAT, GL_FALSE, 0, 0);
+#textures
+snippet new_texture
+	glBindTexture(GL_TEXTURE_2D, tid);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL)
+snippet texture_filter
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, ${1:GL_NEAREST});
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, $1);
+snippet texture_filter_nearest
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+snippet texture_filter_linear
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+#blending
+snippet enable_blend
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA_GL_ONE_MINUS_SRC_ALPHA);
+#clear screen
+snippet clear
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#drawing
+snippet drawa
+	glDrawArrays(${1:GL_TRIANGLES}, ${2:0}, ${3:480});
+snippet drawe
+	glDrawElements(${1:GL_TRIANGLE_STRIP}, ${2:indicies.size()}, GL_UNSIGNED_INT, 0);
+snippet draw_rect
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+#useful lua stuff
+#push values to lua
+snippet luabool
+	lua_pushboolean(l, ${1:true});
+snippet luanum
+	lua_pushnumber(l, ${1:0});
+snippet luanil
+	lua_pushnil(l);
+snippet luaval
+	lua_pushvalue(l, ${1:0});
+snippet luastr
+	lua_pushstring(l, ${1:str});
+snippet luaint
+	lua_pushinteger(l, ${1:0});
+#get values from lua
+snippet getluabool
+	lua_toboolean(l, ${1:1});
+snippet getluanum
+	lua_tonumber(l, ${1:1});
+snippet getluaint
+	lua_tointeger(l, ${1:1});
+snippet getluastr
+	lua_tostring(l, ${1:1});
+
+#create an engine state
+snippet state
+	class ${1:`vim_snippets#Filename('$1', 'name')`} : public cth::engine_state {
+	public:
+		$1();
+
+	public:
+		virtual void handle_event(SDL_Event& e) override;
+		virtual void update() override;
+		virtual void render() override;
+	};
+#implement the engine state virtual methods
+snippet statev
+	${1:`vim_snippets#Filename('$1', 'name')`}::$1(${2}) {
+
+	}
+
+	void $1::handle_event(SDL_Event& e) {
+	
+	}
+
+	void $1::update() {
+	
+	}
+
+	void $1::render() {
+	
+	}
+#create new entity
+snippet entity
+	class ${1:new_entity} : public cth::entity {
+	public:
+		$1() {
+		
+		}
+	};
+#for each type of entity in entity manager
+snippet fore_entity
+	entities.for_each_t<${1:T}>([&]($1& ${2:ent}) {
+		${3}
+	});
+#boost program options
+snippet bpo
+	namespace {
+		struct arg_values;
+		bool process_args(int argc, const char* argv[], arg_values& output);
+
+		struct arg_values {
+			${1:std::string} ${2:test_arg};
+		};
+
+		bool process_args(int argc, const char* argv[], arg_values& output) {
+			namespace po = boost::program_options;
+
+			po::options_description desc("Allowed options");
+			desc.add_options()
+				("help", "produce help message")
+				("${3:test_arg},${4:t}", po::value<$1>(), "${5:description}");
+
+			po::variables_map vm;
+			po::store(po::parse_command_line(argc, argv, desc), vm);
+
+			if(vm.count("help")) {
+				std::cerr << desc << "\n";
+				return false;
+			}
+
+			if(vm.count("$3")) {
+				output.$2 = vm["$3"].as<$1>();
+				std::cerr << "$3 set to: " << output.$2 << ".\n";
+			} else {
+				std::cerr << "$3 was not set.\n";
+				return false;
+			}
+
+			return true;
+		}
+	}
+
+

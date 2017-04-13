@@ -1,0 +1,73 @@
+#uniform
+snippet uniform
+	uniform ${1:vec4} ${2:color};
+#uniform sampler2D
+snippet sampler
+	uniform sampler2D ${1:sampler1};
+#texture function
+snippet texture
+	texture(${1:sampler1}, ${2:uv_in});
+#functions.
+snippet dot
+	dot(${1:a}, ${2:b});
+snippet cross
+	cross(${1:a}, ${2:b});
+snippet len
+	length(${1:a});
+snippet dist
+	distance(${1:a}, ${2:b});
+snippet norm
+	normalize(${1:a});
+snippet ff
+	faceforward(${1:v}, ${2:i}, ${3:nref});
+snippet refl
+	reflect(${1:i}, ${2:n});
+snippet refr
+	refract(${1:i}, ${2:n}, ${3:eta});
+snippet mix
+	mix(${1:x}, ${2:y}, ${3:0.5});
+#matrix functions
+snippet trans
+	transpose(${1:mat});
+snippet inv
+	inverse(${1:mat});
+snippet det
+	determinant(${1:})
+#the most basic shader
+snippet initvert
+	in vec3 position;
+	in vec4 color;
+
+	uniform mat4 mvp_mat;
+
+	void main() {
+		gl_Position = vec4(position.xyz, 1.0);
+		color_in = color;
+	}
+snippet initfrag
+	in vec4 color_in;
+	out vec4 color;
+
+	void main() {
+		color = color_in;
+	}
+#basic vertex shader for rendering textures.
+snippet inittexturevert
+	in vec3 position;
+	in vec2 uv;
+
+	uniform mat4 mvp_mat;
+
+	void main() {
+		gl_Position = mvp_mat * vec4(position.xyz, 1.0);
+		uv_in = uv;
+	}
+snippet inittexturefrag
+	in vec2 uv_in;
+	out vec4 color;
+
+	uniform sampler2D sampler1;
+
+	void main() {
+		color = texture(sampler1, uv_in);
+	}

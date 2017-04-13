@@ -1,22 +1,73 @@
 # base
 snippet base
-	.PHONY: clean, mrproper
+	.PHONY: clean, mrproper, install
 	CC = gcc
 	CFLAGS = -g -Wall
+	OBJ_FILES = $1.o
 
 	all: $1
 
-	%.o: %.c
+	obj/%.o: %.c
+		mkdir -p obj
 		$(CC) $(CFLAGS) -c -o $@ $<
 	
-	${1:out}: $1.o
+	${1:out}: $(addprefix obj/,$(notdir $(OBJ_FILES)))
 		$(CC) $(CFLAGS) -o $@ $+
 
 	clean:
-		rm -f *.o core.*
+		rm -f obj/*.o core.* $1
 
-	mrproper: clean
-		rm -f $1
+	install:
+		cp $1 /usr/local/bin/$1
+#base for cpp
+snippet basepp
+	.PHONY: clean, mrproper, install
+	CC = g++
+	CFLAGS = -g -Wall -std=c++1y
+	LFLAGS =
+	OBJ_FILES = $1.o
+
+	all: $1
+
+	obj/%.o: %.cpp
+		mkdir -p obj
+		$(CC) $(CFLAGS) -c -o $@ $<
+	
+	${1:out}: $(addprefix obj/,$(notdir $(OBJ_FILES)))
+		$(CC) $(CFLAGS) -o $@ $+ $(LFLAGS)
+
+	clean:
+		rm -f obj/*.o core.* $1
+
+	install:
+		cp $1 /usr/local/bin/$1
+#base for cpp using cth
+snippet basecth
+	.PHONY: clean, mrproper, install
+	CC = g++
+	CFLAGS = -g -Wall -std=c++1y
+	LCTH = -lcth -lGLEW -lGL -lSDL2 -lSDL2main -lSDL2_image -lSDL2_mixer -lboost_filesystem -lboost_system -lyaml-cpp -lIL -lILU  -lassimp -llua -ldl -lfreetype
+	LFLAGS = $(LCTH)
+	OBJ_FILES = $1.o
+
+	all: $1
+
+	obj/%.o: %.cpp
+		mkdir -p obj
+		$(CC) $(CFLAGS) -c -o $@ $<
+	
+	${1:out}: $(addprefix obj/,$(notdir $(OBJ_FILES)))
+		$(CC) $(CFLAGS) -o $@ $+ $(LFLAGS)
+
+	clean:
+		rm -f obj/*.o core.* $1
+
+	install:
+		cp $1 /usr/local/bin/$1
+# the simplest makefile
+snippet basic:
+	out: main.cpp
+		g++ -g -Wall -std=c++1y main.cpp -o ${1:out}
 # add
 snippet add
 	${1:out}: $1.o
@@ -48,3 +99,7 @@ snippet help
 	help: ## Prints help for targets with comments
 		@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $\$1, $\$2}'
 	${0}
+# linking cth
+snippet lcth
+	LCTH = -lcth -lGLEW -lGL -lSDL2 -lSDL2main -lSDL2_mixer -lboost_filesystem -lboost_system -lyaml-cpp -lIL -lILU  -lassimp -llua -ldl -lfreetype
+
