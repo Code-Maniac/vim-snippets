@@ -19,3 +19,9 @@ snippet fori
 	for ${1:i},${2:v} in ipairs(${3:table_name}) do
 	   ${0:-- body}
 	end
+#print members of an object
+snippet print_members
+	print(${1:o})
+	for k,v in pairs(getmetatable($1)) do
+		print("member: " .. k)
+	end
