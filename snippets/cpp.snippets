@@ -512,4 +512,195 @@ snippet bpo
 		}
 	}
 
+# doxygen comments
+# header comment
+snippet doxyfunc
+	/*!
+	 * \fn ${1: def}
+	 * \brief ${2:A brief description}
+	 * \param ${3:name} ${4:description}
+	 * \return ${5:description}
+	 *
+	 * ${6:More Detail}
+	 */
+snippet doxyclass
+	/*!
+	 * \class ${1:class}
+	 * \brief ${2:description}
+	 *
+	 * ${3:More Detail}
+	 */
+snippet doxyns
+	/*!
+	 * \namespace ${1:ns}
+	 * \brief ${2:description}
+	 *
+	 * ${3:More Detail}
+	 */
+snippet doxyenum
+	/*!
+	 * \enum ${1:enum}
+	 * \brief ${2:description}
+	 *
+	 * ${3:More Detail}
+	 */
+# qt stuff
+#quickly define a new widget
+snippet widgeth
+	class ${1:widget_name} : public QWidget
+	{
+		Q_OBJECT
 
+	public:
+		$1(QWidget* parent);
+		~$1();
+
+	public:
+		void init();
+
+	public slots:
+
+	signals:
+
+	};
+#quickly define widget in cpp file
+snippet widgetcpp
+	${1:ns}::${2:widget_name}::$2(QWidget* parent) : QWidget(parent)
+	{
+		
+	}
+
+	$1::$2::~$2()
+	{
+	
+	}
+
+	void $1::$2::init()
+	{
+	
+	}
+#quickly define a new page.
+snippet pageh
+	class ${1:pagename} : public Page
+	{
+		Q_OBJECT
+
+	private:
+		/*
+		 * child widgets
+		 */
+
+	public:
+		explicit $1(QWidget* parent = 0);
+		~$1();
+
+	public:
+		/*
+		 * override function on page baseclass
+		 */
+		virtual void init();
+
+		virtual QString getTitle() const;
+		virtual std::vector<r2::buttons> getButtons() const;
+		virtual r2::menus getMenu() const;
+
+	public slots:
+		/*
+		 * override slot functions on page baseclass
+		 * (delete as appropriate)
+		 */
+		virtual void onHomeButtonPressed();
+		virtual void onLimitsButtonPressed();
+		virtual void onLiftingButtonPressed();
+		virtual void onRailButtonPressed();
+	};
+snippet pagecpp
+	r2::${1:pagename}::$1(QWidget* parent) : Page(parent) { }
+
+	r2::$1::~$1() { }
+
+	void r2::$1::init()
+	{
+	
+	}
+
+	QString r2::$1::getTitle() const
+	{
+		return "${2:Page Name}";
+	}
+
+	std::vector<r2::buttons> r2::$1::getButtons() const
+	{
+		std::vector<r2::buttons> bs;
+
+		bs.push_back(r2::HOME_BUTTON);
+		bs.push_back(r2::LIMITS_BUTTON);
+		bs.push_back(r2::LIFTING_BUTTON);
+		bs.push_back(r2::RAIL_BUTTON);
+		bs.push_back(r2::MENU_BUTTON);
+
+		return bs;
+	}
+
+	r2::menus r2::$1::getMenu() const
+	{
+		return ${3:r2::NO_MENU};
+	}
+
+	void r2::$1::onHomeButtonPressed()
+	{
+	
+	}
+
+	void r2::$1::onLimitsButtonPressed()
+	{
+	
+	}
+
+	void r2::$1::onLiftingButtonPressed()
+	{
+	
+	}
+
+	void r2::$1::onRailButtonPressed()
+	{
+	
+	}
+#quickly define connection of signal and slot.
+snippet connect
+	QObject::connect(${1:emitter}, SIGNAL(${2:signal}(${3:type})),
+			 ${4:receiver}, SLOT(${5:slot}($3)));
+#Q_PROPERTY definition
+snippet qprop
+	Q_PROPERTY(${1:type} ${2:name}
+		   READ ${3:read}
+		   WRITE ${4:write})
+#Q_PROPERTY definition with notify signal
+snippet qpropn
+	Q_PROPERTY(${1:type} ${2:name}
+		   READ ${3:read}
+		   WRITE ${4:write}
+		   NOTIFY ${5:signal})
+
+#Definition of get setter in h file.
+snippet gsh
+	${3:doxyfunc}
+	${1:type} get${2:Value}() const;
+	${4:doxyfunc}
+	void set$2($1 val);
+#Defintion of get and setter in cpp file.
+snippet gscpp
+	/*
+	 * Get the value of $4
+	 */
+	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
+	{
+		return $4;
+	}
+	/*
+	 * Set the value of $4
+	 */
+	void $2::$3::set$4($1 val)
+	{
+		$4 = val;
+	}

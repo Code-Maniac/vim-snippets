@@ -1,0 +1,65 @@
+#initialise qml imports
+snippet qmlimports
+	import QtQuick 2.0
+	import Enums 1.0
+	import "styles"
+#page title
+snippet title
+	title: "${1:the title}"
+#quick anchor and margins stuff.
+snippet anchors
+	anchors.left: ${1:parent.left}
+	anchors.right: ${2:parent.right}
+	anchors.bottom: ${3:parent.bottom}
+	anchors.top: ${4:parent.top}
+snippet margins
+	anchors.leftMargin: ${1:Style.margin}
+	anchors.rightMargin: ${2:Style.margin}
+	anchors.bottomMargin: ${3:Style.margin}
+	anchors.topMargin: ${4:Style.margin}
+#quickly create buttons list.
+snippet buttons
+	buttons: [Buttons.HOME_BUTTON,
+		  Buttons.LIMITS_BUTTON,
+		  Buttons.LIFTING_BUTTON,
+		  Button.RAIL_BUTTON,
+		  Buttons.MENU_BUTTON,
+		  Buttons.UP_BUTTON,
+		  Buttons.DOWN_BUTTON,
+		  Buttons.CONFIRM_BUTTON]
+#quickly get a 2d context in a canvas
+snippet context2d
+	var context = getContext("2d");
+	context.reset();
+#properties
+snippet pint
+	property int ${1:num}: ${2:val}
+snippet preal
+	property real ${1:num}: ${2:val}
+snippet pvar
+	property variant ${1:var}: ${2:val}
+snippet pcolor
+	property color ${1:col}: ${2:"#FFFFFF"}
+#properties for a circle
+snippet parc
+	property color ${1:name}ArcColor: ${2:"#FFFFFF"}
+	property real $1ArcLineWidth: ${3:2}
+	property real $1ArcRadius: ${4: 200}
+#center vector
+snippet pcenter
+	property var center: { "x": width / 2, "y": height / 2 }
+#import functions
+snippet ivec2
+	import "../js/Vec2.js" as Vec2
+snippet idrawing
+	import "../js/Drawing/js" as Drawing
+#qml logging
+snippet log
+	console.log(${1:something to shout about});
+#doxygen style comments
+snippet doxyfunc
+	/*!
+	 * ${1:description}
+	 * @param ${2:type:int arg Description}
+	 * @return ${3:type:int Description}
+	 */
