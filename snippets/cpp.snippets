@@ -179,7 +179,8 @@ snippet funptr
 	${1:void} (*${2:name})(${3:arg_types});
 # namespace
 snippet ns
-	namespace ${1:`vim_snippets#Filename('', 'my')`} {
+	namespace ${1:`vim_snippets#Filename('', 'my')`}
+	{
 		${0}
 	} /* namespace $1 */
 # annonymous namespace
@@ -511,39 +512,6 @@ snippet bpo
 			return true;
 		}
 	}
-
-# doxygen comments
-# header comment
-snippet doxyfunc
-	/*!
-	 * \fn ${1: def}
-	 * \brief ${2:A brief description}
-	 * \param ${3:name} ${4:description}
-	 * \return ${5:description}
-	 *
-	 * ${6:More Detail}
-	 */
-snippet doxyclass
-	/*!
-	 * \class ${1:class}
-	 * \brief ${2:description}
-	 *
-	 * ${3:More Detail}
-	 */
-snippet doxyns
-	/*!
-	 * \namespace ${1:ns}
-	 * \brief ${2:description}
-	 *
-	 * ${3:More Detail}
-	 */
-snippet doxyenum
-	/*!
-	 * \enum ${1:enum}
-	 * \brief ${2:description}
-	 *
-	 * ${3:More Detail}
-	 */
 # qt stuff
 #quickly define a new widget
 snippet widgeth
@@ -552,7 +520,7 @@ snippet widgeth
 		Q_OBJECT
 
 	public:
-		$1(QWidget* parent);
+		explicit $1(QWidget* parent = NULL);
 		~$1();
 
 	public:
@@ -567,7 +535,8 @@ snippet widgeth
 snippet widgetcpp
 	${1:ns}::${2:widget_name}::$2(QWidget* parent) : QWidget(parent)
 	{
-		
+		setObjectName("$2");
+		init();
 	}
 
 	$1::$2::~$2()
@@ -591,7 +560,7 @@ snippet pageh
 		 */
 
 	public:
-		explicit $1(QWidget* parent = 0);
+		explicit $1(QWidget* parent = NULL);
 		~$1();
 
 	public:
@@ -602,7 +571,8 @@ snippet pageh
 
 		virtual QString getTitle() const;
 		virtual std::vector<r2::buttons> getButtons() const;
-		virtual r2::menus getMenu() const;
+	private:
+		virtual MenuOptions getMenuOptions() const;
 
 	public slots:
 		/*
@@ -613,56 +583,69 @@ snippet pageh
 		virtual void onLimitsButtonPressed();
 		virtual void onLiftingButtonPressed();
 		virtual void onRailButtonPressed();
+
+		virtual void onMenuCommand(R2::MenuCommands command);
 	};
 snippet pagecpp
-	r2::${1:pagename}::$1(QWidget* parent) : Page(parent) { }
+	R2::${1:pagename}::$1(QWidget* parent) : Page(parent) { }
 
-	r2::$1::~$1() { }
+	R2::$1::~$1() { }
 
-	void r2::$1::init()
+	void R2::$1::init()
 	{
 	
 	}
 
-	QString r2::$1::getTitle() const
+	QString R2::$1::getTitle() const
 	{
 		return "${2:Page Name}";
 	}
 
-	std::vector<r2::buttons> r2::$1::getButtons() const
+	std::vector<R2::buttons> R2::$1::getButtons() const
 	{
-		std::vector<r2::buttons> bs;
+		std::vector<R2::buttons> bs;
 
-		bs.push_back(r2::HOME_BUTTON);
-		bs.push_back(r2::LIMITS_BUTTON);
-		bs.push_back(r2::LIFTING_BUTTON);
-		bs.push_back(r2::RAIL_BUTTON);
-		bs.push_back(r2::MENU_BUTTON);
+		bs.push_back(R2::HOME_BUTTON);
+		bs.push_back(R2::LIMITS_BUTTON);
+		bs.push_back(R2::LIFTING_BUTTON);
+		bs.push_back(R2::RAIL_BUTTON);
+		bs.push_back(R2::MENU_BUTTON);
 
 		return bs;
 	}
 
-	r2::menus r2::$1::getMenu() const
+	R2::MenuOptions R2::$1::getMenuOptions() const
 	{
-		return ${3:r2::NO_MENU};
+		MenuOptions options;
+		
+		/*
+		 * push options here.
+		 */
+
+		return options;
 	}
 
-	void r2::$1::onHomeButtonPressed()
-	{
-	
-	}
-
-	void r2::$1::onLimitsButtonPressed()
-	{
-	
-	}
-
-	void r2::$1::onLiftingButtonPressed()
+	void R2::$1::onHomeButtonPressed()
 	{
 	
 	}
 
-	void r2::$1::onRailButtonPressed()
+	void R2::$1::onLimitsButtonPressed()
+	{
+	
+	}
+
+	void R2::$1::onLiftingButtonPressed()
+	{
+	
+	}
+
+	void R2::$1::onRailButtonPressed()
+	{
+	
+	}
+
+	void R2::$1::onMenuCommand(R2::MenuCommands command)
 	{
 	
 	}
@@ -672,24 +655,102 @@ snippet connect
 			 ${4:receiver}, SLOT(${5:slot}($3)));
 #Q_PROPERTY definition
 snippet qprop
+	/*!
+	 * \brief Qt accessor for m$3
+	 * \accessors get$3(), set$3()
+	 */
 	Q_PROPERTY(${1:type} ${2:name}
-		   READ ${3:read}
-		   WRITE ${4:write})
+		   READ get${3:Name}
+		   WRITE set$3)
 #Q_PROPERTY definition with notify signal
 snippet qpropn
+	/*!
+	 * \brief Qt accessor for m$3
+	 * \accessors get$3(), set$3()
+	 */
 	Q_PROPERTY(${1:type} ${2:name}
-		   READ ${3:read}
-		   WRITE ${4:write}
-		   NOTIFY ${5:signal})
+		   READ get${3:Name}
+		   WRITE set$3
+		   NOTIFY $2Changed)
 
+#Definition of getter in h file.
+snippet gh
+	/*!
+	 * \brief Get the value of m$2
+	 * \return The value of m$2
+	 */
+	${1:type} get${2:Value}() const;
+snippet sh
+	/*!
+	 * \brief Set the value m$2
+	 * \param val The new value of m$2
+	 */
+	void set$2($1 val);
 #Definition of get setter in h file.
 snippet gsh
-	${3:doxyfunc}
+	/*!
+	 * \brief Get the value of m$2
+	 * \return The value of m$2
+	 */
 	${1:type} get${2:Value}() const;
-	${4:doxyfunc}
+	/*!
+	 * \brief Set the value m$2
+	 * \param val The new value of m$2
+	 */
 	void set$2($1 val);
-#Defintion of get and setter in cpp file.
-snippet gscpp
+#Definition of getter in cpp file. (camel case)
+snippet gcppcc
+	/*
+	 * Get the value of m$4
+	 */
+	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
+	{
+		return m$4;
+	}
+#Definition of setter in cpp file. (camel case)
+snippet scppcc
+	/*
+	 * Set the value of m$4
+	 */
+	void $2::$3::set$4($1 val)
+	{
+		m$4 = val;
+	}
+#Defintion of getter and setter in cpp file. (camel case)
+snippet gscppcc
+	/*
+	 * Get the value of m$4
+	 */
+	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
+	{
+		return m$4;
+	}
+	/*
+	 * Set the value of m$4
+	 */
+	void $2::$3::set$4($1 val)
+	{
+		m$4 = val;
+	}
+#definition of getter in cpp file. (snake case)
+snippet gcppsc
+	/*
+	 * Get the value of $4
+	 */
+	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
+	{
+		return $4;
+	}
+snippet scppsc
+	/*
+	 * Set the value of $4
+	 */
+	void $2::$3::set$4($1 val)
+	{
+		$4 = val;
+	}
+#definition of getter and setter in cpp file. (snake case)
+snippet gscppsc
 	/*
 	 * Get the value of $4
 	 */
@@ -704,3 +765,17 @@ snippet gscpp
 	{
 		$4 = val;
 	}
+#Comment for r2 requirements
+snippet r2req
+	Fulfills requirements:
+	* -#
+	* <a href="https://confluence.prolec.info/display/R2/HCI#req-${1:HI-0001}">
+	*    $1
+	* </a>
+snippet r2softreq
+	Fulfills requirements:
+	* -#
+	* <a
+	* href="https://confluence.prolec.info/display/R2/Software+Requirements#req-${1:SW-001}">
+	*    $1
+	* </a>
