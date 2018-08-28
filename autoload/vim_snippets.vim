@@ -1,3 +1,13 @@
+
+fun! vim_snippets#Sub(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+  let sub = get(a:000, 2, "")
+
+  return substitute(template, '$1', sub, 'g')
+endfun
+
+
 " this is well known Filename found in snipmate (and the other engines), but
 " rewritten and documented :)
 "
@@ -9,19 +19,62 @@
 fun! vim_snippets#Filename(...)
   let template = get(a:000, 0, "$1")
   let arg2 = get(a:000, 1, "")
-
   let basename = expand('%:t:r')
 
-  if basename == ''
-    return arg2
-  else
-    return substitute(template, '$1', basename, 'g')
-  endif
+  return vim_snippets#Sub(template, arg2, basename)
 endf
 
-" original code:
-" fun! Filename(...)
-"     let filename = expand('%:t:r')
-"     if filename == '' | return a:0 == 2 ? a:2 : '' | endif
-"     return !a:0 || a:1 == '' ? filename : substitute(a:1, '$1', filename, 'g')
-" endf
+" get the extension of the current file.
+fun! vim_snippets#Extension(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+
+  let extension = '.' . expand('%:e')
+
+  return vim_snippets#Sub(template, arg2, extension)
+endfunc
+
+" get the filename of the current file.
+fun! vim_snippets#FilenameExt(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+
+  let name = expand('%:t')
+
+  return vim_snippets#Sub(template, arg2, name)
+endf
+
+" DATE AND TIME FUNCTIONS
+fun! vim_snippets#Datetime(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+  let format = get(a:000, 2, "%c")
+
+  let datetime = strftime(format)
+
+  return vim_snippets#Sub(template, arg2, datetime)
+endf
+
+fun! vim_snippets#DateUK(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+  let format = "%d/%m/%y"
+
+  return vim_snippets#Datetime(template, arg2, format)
+endfun
+
+fun! vim_snippets#DateUS(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+  let format = "%m/%d/%y"
+
+  return vim_snippets#Datetime(template, arg2, format)
+endfun
+
+fun! vim_snippets#Time(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+  let format = "%H:%M:%S"
+
+  return vim_snippets#Datetime(template, arg2, format)
+endfun
