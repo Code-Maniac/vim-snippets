@@ -213,6 +213,12 @@ snippet cerr_args
 # static
 snippet sca
 	static_cast<${1:unsigned}>(${2:expr})${3}
+# static cast to float32_t
+snippet f32ca
+	static_cast<float32_t>(${1:expr})${2}
+# static cast to float32_t
+snippet f64ca
+	static_cast<float64_t>(${1:expr})${2}
 # dynamic
 snippet dca
 	dynamic_cast<${1:unsigned}>(${2:expr})${3}
@@ -222,6 +228,7 @@ snippet rca
 # const
 snippet cca
 	const_cast<${1:unsigned}>(${2:expr})${3}
+
 ## Iteration
 # for i
 snippet fori
@@ -520,20 +527,29 @@ snippet widgeth
 		Q_OBJECT
 
 	public:
-		explicit $1(QWidget* parent = NULL);
+		/*!
+		 * \brief $1 Constructor
+		 * \param parent The QWidget parent
+		 */
+		explicit $1(QWidget* const parent = NULL);
+		/*!
+		 * \brief $1 Destructor
+		 */
 		~$1();
-
-	public:
-		void init();
 
 	public slots:
 
 	signals:
 
+	private:
+		/*!
+		 * \brief Initialise the $1
+		 */
+		void init();
 	};
 #quickly define widget in cpp file
 snippet widgetcpp
-	${1:ns}::${2:widget_name}::$2(QWidget* parent) : QWidget(parent)
+	${1:ns}::${2:widget_name}::$2(QWidget* const parent) : QWidget(parent)
 	{
 		setObjectName("$2");
 		init();
@@ -554,24 +570,17 @@ snippet pageh
 	{
 		Q_OBJECT
 
-	private:
-		/*
-		 * child widgets
-		 */
-
 	public:
-		explicit $1(QWidget* parent = NULL);
+		explicit $1(QWidget* const parent = NULL);
 		~$1();
 
-	public:
 		/*
 		 * override function on page baseclass
 		 */
 		virtual void init();
 
 		virtual QString getTitle() const;
-		virtual std::vector<r2::buttons> getButtons() const;
-	private:
+		virtual std::vector<ButtonID> getButtons() const;
 		virtual MenuOptions getMenuOptions() const;
 
 	public slots:
@@ -584,10 +593,22 @@ snippet pageh
 		virtual void onLiftingButtonPressed();
 		virtual void onRailButtonPressed();
 
-		virtual void onMenuCommand(R2::MenuCommands command);
+		virtual void onMenuButtonPressed();
+		virtual void onUpButtonPressed();
+		virtual void onDownButtonPressed();
+		virtual void onConfirmButtonPressed();
+
+		virtual void onMenuCommand(MenuCommands com);
+
+	private:
+		/*
+		 * child widgets
+		 */
 	};
 snippet pagecpp
-	R2::${1:pagename}::$1(QWidget* parent) : Page(parent) { }
+	R2::${1:pagename}::$1(QWidget* const parent) :
+		Page(parent)
+	{ }
 
 	R2::$1::~$1() { }
 
@@ -601,15 +622,15 @@ snippet pagecpp
 		return "${2:Page Name}";
 	}
 
-	std::vector<R2::buttons> R2::$1::getButtons() const
+	std::vector<R2::ButtonID> R2::$1::getButtons() const
 	{
-		std::vector<R2::buttons> bs;
+		std::vector<ButtonID> bs;
 
-		bs.push_back(R2::HOME_BUTTON);
-		bs.push_back(R2::LIMITS_BUTTON);
-		bs.push_back(R2::LIFTING_BUTTON);
-		bs.push_back(R2::RAIL_BUTTON);
-		bs.push_back(R2::MENU_BUTTON);
+		bs.push_back(HOME_BUTTON);
+		bs.push_back(LIMITS_BUTTON);
+		bs.push_back(LIFTING_BUTTON);
+		bs.push_back(RAIL_BUTTON);
+		bs.push_back(MENU_BUTTON);
 
 		return bs;
 	}
@@ -645,12 +666,15 @@ snippet pagecpp
 	
 	}
 
-	void R2::$1::onMenuCommand(R2::MenuCommands command)
+	void R2::$1::onMenuCommand(R2::MenuCommand command)
 	{
 	
 	}
-#quickly define connection of signal and slot.
 snippet connect
+	connect(${1:emitter}, SIGNAL(${2:signal}(${3:type})),
+		${4:receiver}, SLOT(${5:slot}($3)));
+#quickly define static connection of signal and slot.
+snippet sconnect
 	QObject::connect(${1:emitter}, SIGNAL(${2:signal}(${3:type})),
 			 ${4:receiver}, SLOT(${5:slot}($3)));
 #Q_PROPERTY definition
@@ -682,10 +706,10 @@ snippet gh
 	${1:type} get${2:Value}() const;
 snippet sh
 	/*!
-	 * \brief Set the value m$2
+	 * \brief Set the value of m$2
 	 * \param val The new value of m$2
 	 */
-	void set$2($1 val);
+	void set${2:Value}(${1:type} val);
 #Definition of get setter in h file.
 snippet gsh
 	/*!
@@ -694,73 +718,51 @@ snippet gsh
 	 */
 	${1:type} get${2:Value}() const;
 	/*!
-	 * \brief Set the value m$2
+	 * \brief Set the value of m$2
 	 * \param val The new value of m$2
 	 */
 	void set$2($1 val);
 #Definition of getter in cpp file. (camel case)
 snippet gcppcc
-	/*
-	 * Get the value of m$4
-	 */
 	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
 	{
 		return m$4;
 	}
 #Definition of setter in cpp file. (camel case)
 snippet scppcc
-	/*
-	 * Set the value of m$4
-	 */
 	void $2::$3::set$4($1 val)
 	{
 		m$4 = val;
 	}
 #Defintion of getter and setter in cpp file. (camel case)
 snippet gscppcc
-	/*
-	 * Get the value of m$4
-	 */
 	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
 	{
 		return m$4;
 	}
-	/*
-	 * Set the value of m$4
-	 */
+
 	void $2::$3::set$4($1 val)
 	{
 		m$4 = val;
 	}
 #definition of getter in cpp file. (snake case)
 snippet gcppsc
-	/*
-	 * Get the value of $4
-	 */
 	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
 	{
 		return $4;
 	}
 snippet scppsc
-	/*
-	 * Set the value of $4
-	 */
 	void $2::$3::set$4($1 val)
 	{
 		$4 = val;
 	}
 #definition of getter and setter in cpp file. (snake case)
 snippet gscppsc
-	/*
-	 * Get the value of $4
-	 */
 	${1:type} ${2:ns}::${3:class}::get${4:Value}() const
 	{
 		return $4;
 	}
-	/*
-	 * Set the value of $4
-	 */
+
 	void $2::$3::set$4($1 val)
 	{
 		$4 = val;
@@ -792,4 +794,49 @@ snippet pheader
 	// Copyright © James Fisher Prolec Ltd.
 	//
 	////////////////////////////////////////////////////////////////////////////////
+snippet StatusListenerh
+	/*!
+	 * \brief StatusListener onStatusChanged interface implementation
+	 * \param spn The spn of the status that has changed
+	 * \param val The value of the status that has changed
+	 */
+	virtual void onStatusChanged(const uint32_t spn, const uint8_t val);
+	/*!
+	 * \brief StatusListener onStatusMaxSeverityChanged interface implementation
+	 * \param sev The new max severity of registered status'
+	 */
+	virtual void onStatusMaxSeverityChanged(const Severity sev);
+snippet StatusListenercpp
+	void R2::${1:ClassName}::onStatusChanged(const uint32_t spn, const uint8_t val)
+	{
+	   (void)spn;
+	   (void)val;
+	}
 
+	void R2::$1::onStatusMaxSeverityChanged(const Severity sev)
+	{
+	   (void)sev;
+	}
+snippet fulfills
+	 /*
+	  * Fulfills requirements:
+	  * -#
+	  * <a href="https://confluence.prolec.info/display/R2/Software+Requirements#req-SW-${1:xxx}">
+	  *    SW-$1
+	  * </a>
+snippet testAPL
+	uint8_t data[8U] = {
+		${3:data}
+	};
+	APL_t_MSG ${1:msg} = {
+		0x47U,
+		0x28U,
+		6U,
+		8U,
+		${2:pgn},
+		&data[0]
+	};
+	emit jmh->messageReceived(&$1);
+#lint snippets
+snippet lintnew
+	/*lint -e{9173} use of new required by Qt*/
